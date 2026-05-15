@@ -231,6 +231,43 @@ Generated visualizations:
 
 ---
 
+# Reproducing Computer Vision Pipeline (Snow Segmentation)
+
+The snow segmentation pipeline is implemented in Google Earth Engine (GEE).
+
+## 1. Run Google Earth Engine Script
+Open the following script in GEE Code Editor:
+
+```
+GEE/snowflows_s2_segmentation.js
+```
+
+## 2. Generate Satellite Dataset
+The script performs:
+- Sentinel-2 image filtering over Lebanon
+- Cloud masking using SCL layer
+- Computation of NDSI index
+- Snow classification using threshold (NDSI > 0.4)
+
+## 3. Export Outputs
+From GEE, export:
+- RGB images (B4, B3, B2)
+- Binary snow masks
+- Weekly snow coverage statistics (CSV)
+
+Exported files are saved to Google Drive folder:
+```
+SnowCV/
+```
+
+## 4. Use Outputs in Python Pipeline
+The exported CSV and images are used as input for:
+- feature engineering
+- sequence generation
+- LSTM training
+
+---
+
 # Results
 
 ## Segmentation Performance

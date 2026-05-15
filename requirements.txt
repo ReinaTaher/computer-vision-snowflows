@@ -1,0 +1,12 @@
+numpy
+pandas
+matplotlib
+scikit-learn
+tensorflow
+rasterio
+earthengine-api
+plotly
+opencv-python
+tifffile
+jupyter
+notebook

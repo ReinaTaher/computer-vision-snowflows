@@ -1,118 +1,271 @@
-# SnowFLOWS – Snow Segmentation and Time-Series Prediction from Satellite Imagery
+# SnowFLOWS  
+### Satellite-Based Snow Cover Segmentation and Time-Series Prediction Using Sentinel-2 and Deep Learning
 
-## Project Overview
-
-SnowFLOWS is a computer vision and machine learning project that analyzes and predicts snow coverage evolution using satellite imagery.
+SnowFLOWS is a computer vision and deep learning project for monitoring and forecasting snow cover over Lebanon using Sentinel-2 satellite imagery, Google Earth Engine, and LSTM-based temporal prediction models.
 
 The project combines:
-- Google Earth Engine (GEE) for satellite data extraction
-- Computer Vision for snow segmentation using NDSI
-- Machine Learning (LSTM) for time-series forecasting of snow coverage
-
-The main objective is to estimate and predict snow dynamics over Lebanon using Sentinel-2 imagery.
-
----
-
-## Project Pipeline
-
-### 1. Satellite Data Acquisition (GEE)
-- Sentinel-2 Level-2A imagery is used
-- Cloud masking is applied using the SCL band
-- Images are filtered spatially over Lebanon and temporally over multiple years
+- Remote sensing
+- Computer vision (snow segmentation)
+- Time-series forecasting
+- Deep learning
 
 ---
 
-### 2. Snow Segmentation (Computer Vision)
-Snow detection is performed using the Normalized Difference Snow Index (NDSI):
+# Project Overview
 
+The pipeline performs:
+
+1. Satellite image acquisition using Sentinel-2 imagery from Google Earth Engine  
+2. Snow segmentation using the Normalized Difference Snow Index (NDSI)  
+3. Snow area extraction and weekly aggregation  
+4. Dataset preprocessing and feature engineering  
+5. LSTM-based snow prediction  
+
+---
+
+# Features
+
+- Sentinel-2 preprocessing with cloud masking
+- Snow segmentation using NDSI thresholding
+- RGB image and snow mask export
+- Weekly snow coverage computation
+- Time-series dataset construction
+- Sequence generation for LSTM
+- Multi-feature prediction pipeline
+- Sequence length comparison experiments
+- Visualization of predictions and loss curves
+
+---
+
+# Project Structure
+
+```text
+FYP_1/
+│
+├── data/
+│   ├── masks/
+│   └── rgb/
+│
+├── evaluation/
+│   └── evaluate_segmentation.py
+│
+├── GEE/
+│
+├── create_sequences.py
+├── create_sequences_altitudes.py
+├── data_fix_year_representation.py
+├── splitting_data.py
+├── target_column_added.py
+├── zscore_transformation.py
+│
+├── train_lstm.py
+├── train_lstm_altitudes.py
+│
+├── sequence_comparison.py
+├── sequence_comparison.html
+│
+├── full_timeline_predictions.html
+├── full_timeline_predictions_altitudes.html
+├── loss_plot.html
+├── mae_plot.html
+│
+├── weekly_snow_model_ready_fixed_dates.csv
+├── weekly_snow_model_ready_with_target.csv
+│
+├── X_train.npy
+├── X_val.npy
+├── X_test.npy
+├── y_train.npy
+├── y_val.npy
+├── y_test.npy
+│
+└── README.md
+```
+
+---
+
+# Dataset
+
+## Satellite Data
+- Source: Sentinel-2 Surface Reflectance
+- Platform: Google Earth Engine
+- Region: Lebanon
+- Temporal coverage: 2016–2025
+- Spatial resolution: 10–20 m
+
+## Spectral Bands Used
+
+| Band | Description |
+|------|-------------|
+| B3 | Green |
+| B4 | Red |
+| B8 | Near Infrared (NIR) |
+| B11 | Short-Wave Infrared (SWIR) |
+
+---
+
+# Snow Segmentation
+
+Snow segmentation is performed using the Normalized Difference Snow Index (NDSI):
+
+```math
 NDSI = (Green - SWIR) / (Green + SWIR)
+```
 
-Snow pixels are classified using:
-- Threshold: NDSI > 0.4
+Decision rule:
 
-Outputs:
-- RGB satellite images
-- Binary snow masks (GeoTIFF format)
-- Paired datasets for evaluation and machine learning
+```text
+NDSI > 0.4  → Snow
+NDSI ≤ 0.4  → Non-snow
+```
 
----
-
-### 3. Dataset Preparation
-From segmentation results:
-- Snow coverage is extracted per image
-- Weekly time-series dataset is constructed
-- Features are normalized using Z-score normalization
-- Sequences are generated for temporal learning
+Output:
+- Binary snow masks
+- Snow-covered area estimation
+- Weekly time-series data
 
 ---
 
-### 4. Time-Series Prediction (LSTM)
-LSTM models are trained to predict future snow coverage.
+# Machine Learning Pipeline
 
-Inputs:
-- Historical snow coverage sequences
-- Optional altitude-based features
+The prediction stage includes:
+- Feature engineering
+- Z-score normalization
+- Sliding-window sequence generation
+- LSTM neural networks
 
-Outputs:
-- Future snow coverage prediction
+Input sequence experiments:
+- 1 to 12 weeks
+- Best trade-off observed around 6–8 weeks
 
----
-
-## Project Structure
-
-
----
-
-## Google Earth Engine (GEE)
-
-- Sentinel-2 Surface Reflectance data is used
-- Cloud masking is applied using Scene Classification Layer (SCL)
-- Snow detection is performed using NDSI thresholding
-- Outputs include:
-  - RGB images
-  - Binary snow masks
-  - Temporal snow coverage estimates
+Evaluation metrics:
+- MAE
+- RMSE
+- IoU
+- Dice coefficient
+- Pixel accuracy
 
 ---
 
-## Evaluation (Computer Vision)
+# Installation
 
-Segmentation performance is evaluated using:
-
-- Intersection over Union (IoU)
-- Dice Coefficient
-- Pixel Accuracy
-
-These metrics measure the similarity between predicted and reference snow masks.
-
----
-
-## Machine Learning Model (LSTM)
-
-### Input:
-- Sequential snow coverage values over time
-- Optional altitude-based features
-
-### Output:
-- Future snow coverage prediction
-
-### Models:
-- Basic LSTM model (`train_lstm.py`)
-- Enhanced LSTM with altitude features (`train_lstm_altitudes.py`)
-
----
-
-## Outputs
-
-The project generates:
-- Snow coverage predictions over time
-- Loss and MAE training curves
-- Interactive visualizations (HTML files)
-- Sequence comparison plots
-
----
-
-## Installation
+## 1. Clone Repository
 
 ```bash
-pip install numpy pandas tensorflow scikit-learn rasterio matplotlib
+git clone https://github.com/ReinaTaher/computer-vision-snowflows.git
+cd computer-vision-snowflows
+```
+
+---
+
+## 2. Create Environment
+
+```bash
+conda create -n snowflows python=3.10
+conda activate snowflows
+```
+
+---
+
+## 3. Install Dependencies
+
+```bash
+pip install numpy pandas matplotlib scikit-learn tensorflow rasterio earthengine-api
+```
+
+---
+
+# Running the Project
+
+## 1. Prepare Dataset
+
+```bash
+python target_column_added.py
+python zscore_transformation.py
+python create_sequences.py
+```
+
+---
+
+## 2. Train LSTM Model
+
+```bash
+python train_lstm.py
+```
+
+Alternative altitude-aware model:
+
+```bash
+python train_lstm_altitudes.py
+```
+
+---
+
+## 3. Run Segmentation Evaluation
+
+```bash
+cd evaluation
+python evaluate_segmentation.py
+```
+
+---
+
+# Running Inference
+
+To generate snow predictions:
+
+```bash
+python train_lstm.py
+```
+
+The script outputs:
+- Predicted snow values
+- MAE / RMSE metrics
+- Timeline prediction plots
+- Loss curves
+
+Generated visualizations:
+- `full_timeline_predictions.html`
+- `loss_plot.html`
+- `mae_plot.html`
+
+---
+
+# Results
+
+## Segmentation Performance
+- IoU ≈ 0.74
+- Dice ≈ 0.82
+- Accuracy ≈ 0.88
+
+## Forecasting Observations
+- Short sequences → unstable predictions
+- Medium sequences → best trade-off
+- Long sequences → smoother but less reactive
+
+---
+
+# Future Improvements
+
+- Deep learning segmentation (U-Net)
+- Better cloud handling
+- Transformer-based forecasting
+- Larger manually labeled datasets
+- Real-time monitoring pipeline
+
+---
+
+# Authors
+
+- Reina Taher  
+- Carla Youness  
+- Nour el Saghir  
+
+### Saint Joseph University of Beirut (USJ)  
+### École Supérieure d’Ingénieurs de Beyrouth (ESIB)
+
+---
+
+# License
+
+This project was developed for academic and research purposes.
